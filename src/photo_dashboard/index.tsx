@@ -8,10 +8,9 @@ import InfoBox from "./InfoBox";
 
 export default function NASAPhoto() {
   const { date, set_date, photoInfo, error, isLoading } = useNASAPhotos();
-  console.log("error", error, date, photoInfo);
   return (
     <Dashboard className="dashboard">
-      <header className="date-header">
+      <header className="date-header" data-testid="date-picker">
         <DatePicker
           selected={new Date(date)}
           onChange={(date: Date) => set_date(date)}
@@ -20,7 +19,7 @@ export default function NASAPhoto() {
       </header>
 
       <main>
-        <Display url={photoInfo.url} isLoading={isLoading} />
+        <Display url={photoInfo.url} isLoading={isLoading} error={error} />
         <InfoBox photoInfo={photoInfo} />
       </main>
     </Dashboard>

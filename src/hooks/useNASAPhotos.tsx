@@ -3,7 +3,7 @@ import axios from "axios";
 
 const CACHE: Cache = {} as Cache; // for caching the requests in browser, only use the api when necessary
 
-export default function useStaleRefresh() {
+export default function useNASAPhotos() {
   const [date, set_date] = useState(new Date());
   const [photoInfo, set_photoInfo] = useState({} as IPhotoInfo);
   const [isLoading, set_Loading] = useState(false);
@@ -14,21 +14,17 @@ export default function useStaleRefresh() {
   const APIkey = "HnKGwhlgqB1cfPUEfj1rxQrc8C56Il2HAq8SPAGc";
   const url = `https://api.nasa.gov/planetary/apod?api_key=${APIkey}&date=${dateFormatted}`;
 
-  console.log("dateFormatted", dateFormatted);
   const fetchNASAPhotoData = useCallback(async () => {
     set_Loading(true);
+    set_error("");
     if (dateFormatted.length) {
       try {
-        console.log("url", url);
         const response = await axios.get(url);
-        // console.log('inawait', response);
-
         const nasaPhotoInfo = {
           explanation: response.data.explanation,
           title: response.data.title,
           url: response.data.url,
         };
-        console.log("nasaPhotoInfo", nasaPhotoInfo);
         set_photoInfo({
           explanation: nasaPhotoInfo.explanation,
           title: nasaPhotoInfo.title,
@@ -36,7 +32,6 @@ export default function useStaleRefresh() {
         });
         CACHE[dateFormatted] = nasaPhotoInfo;
       } catch (error: unknown) {
-        console.log("error", error);
         const { message } = error as Error;
         set_error(message);
       } finally {
@@ -46,8 +41,9 @@ export default function useStaleRefresh() {
   }, [dateFormatted, url]);
 
   useEffect(() => {
-    if (dateFormatted in CACHE) set_photoInfo(CACHE[dateFormatted]);
-    else fetchNASAPhotoData();
+    if (dateFormatted in CACHE) {
+      set_photoInfo(CACHE[dateFormatted]);
+    } else fetchNASAPhotoData();
 
     // return
   }, [dateFormatted, fetchNASAPhotoData]);
@@ -71,7 +67,7 @@ function format(inputDate: Date) {
 export interface IPhotoInfo {
   title: string;
   explanation: string;
-  url: "string";
+  url: string;
 }
 
 type Cache = Record<string, IPhotoInfo>;

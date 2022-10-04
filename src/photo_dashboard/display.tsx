@@ -1,19 +1,22 @@
-import { IPhotoInfo } from "../hooks/useNASAPhotos";
+import Loading from "./loading";
 
 export default function display({
   url,
   isLoading,
+  error,
 }: {
   url: string;
   isLoading: boolean;
+  error: string;
 }) {
+  const ErrorNote = ({ error }: { error: string }) => (
+    <div className="center">error in retreiving data {error}</div>
+  );
   const isImage = () => url && url.includes(".jpg");
   const isVideo = () => url && url.includes("youtube");
-
-  if (isLoading) return <div>isLoading</div>;
-
-  if (isImage()) return <img src={url} alt="nasa image" />;
-  if (isVideo())
+  if (isLoading) return <Loading />;
+  else if (isImage()) return <img src={url} alt="nasa" />;
+  else if (isVideo())
     return (
       <iframe
         width="960"
@@ -24,5 +27,6 @@ export default function display({
         allowFullScreen={true}
       />
     );
-  else return <div>error</div>;
+  else if (error && error.length) return <ErrorNote error={error} />;
+  else return <ErrorNote error="" />;
 }
